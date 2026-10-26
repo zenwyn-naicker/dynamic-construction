@@ -1,0 +1,310 @@
+.project-panels-row {
+  display: flex;
+  gap: 10px;
+  height: 620px;
+}
+
+.project-panel {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--paper-deep);
+  transition:
+    flex-grow 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.project-panel.open {
+  flex-grow: 5.2;
+}
+
+.project-panel img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.05);
+  transition:
+    opacity 0.9s ease,
+    transform 1.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.project-panel img.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.project-panel-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(23, 23, 20, 0.82) 0%,
+    rgba(23, 23, 20, 0.38) 36%,
+    rgba(23, 23, 20, 0) 62%
+  );
+}
+
+.project-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(23, 23, 20, 0.36);
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.project-panel.open::after {
+  opacity: 0;
+}
+
+.project-panel:not(.open):hover::after {
+  opacity: 0.4;
+}
+
+.project-panel-title {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  z-index: 3;
+  color: white;
+  font-family: Georgia, serif;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-shadow: 0 1px 10px rgba(23, 23, 20, 0.45);
+  writing-mode: vertical-rl;
+  transform: translateX(-50%) rotate(180deg);
+  transition: opacity 0.35s ease;
+}
+
+.project-panel.open .project-panel-title {
+  opacity: 0;
+}
+
+.project-panel-select {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.project-panel-select:focus-visible {
+  outline: 3px solid white;
+  outline-offset: -8px;
+}
+
+.project-panel-content {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px 36px 30px;
+  color: white;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0s linear 0.3s;
+}
+
+.project-panel.open .project-panel-content {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.6s ease 0.5s,
+    visibility 0s;
+}
+
+.project-panel-stage {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 14px;
+  background: rgba(247, 243, 236, 0.95);
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.project-panel-stage b {
+  color: var(--accent);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.project-panel-content > div {
+  max-width: 600px;
+}
+
+.project-panel h3 {
+  margin: 0 0 14px;
+  color: white;
+  font-family: Georgia, serif;
+  font-size: clamp(36px, 4.2vw, 58px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.project-panel-content p:not(.project-panel-stage) {
+  margin: 0 0 20px;
+  color: #ede8df;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.project-panel-stages {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.project-panel-stages button {
+  position: relative;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.project-panel-stages button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+.project-panel-stages button > span {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 3px;
+  margin-top: -1.5px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.32);
+  transition: background-color 0.2s;
+}
+
+.project-panel-stages button:hover > span {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.project-panel-stages button > span > span {
+  display: block;
+  height: 100%;
+  background: white;
+  transform-origin: left center;
+  transition: transform 0.1s linear;
+}
+
+.project-panels-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  margin-bottom: 48px;
+}
+
+.project-panels-footer p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.project-panels-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.project-panels-controls button {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
+}
+
+.project-panels-controls button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@media (max-width: 780px) {
+  .project-panels-row {
+    flex-direction: column;
+    height: auto;
+    gap: 8px;
+  }
+  .project-panel {
+    flex: none;
+    height: 84px;
+  }
+  .project-panel.open {
+    height: 540px;
+  }
+  .project-panel-title {
+    top: 50%;
+    bottom: auto;
+    left: 20px;
+    font-size: 22px;
+    writing-mode: horizontal-tb;
+    transform: translateY(-50%);
+  }
+  .project-panel-content {
+    padding: 18px 20px 20px;
+  }
+  .project-panel-content p:not(.project-panel-stage) {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-panel {
+    transition:
+      flex-grow 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
+      height 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  }
+  .project-panel::after,
+  .project-panel-title {
+    transition: opacity 0.4s ease !important;
+  }
+  .project-panel-content {
+    transition:
+      opacity 0.3s ease,
+      visibility 0s linear 0.3s !important;
+  }
+  .project-panel.open .project-panel-content {
+    transition:
+      opacity 0.6s ease 0.5s,
+      visibility 0s !important;
+  }
+  .project-panel img,
+  .project-panel img.visible {
+    transform: none;
+    transition: opacity 0.9s ease !important;
+  }
+  .project-panel-stages button > span > span {
+    transition: transform 0.1s linear !important;
+  }
+}

@@ -1,0 +1,20 @@
+# Dynamic Construction
+User-agent: *
+Allow: /
+
+# Account and portal pages
+Disallow: /signin
+Disallow: /profile
+Disallow: /client
+Disallow: /staff
+
+# Exclude API routes except requests needed to render public pages.
+Disallow: /api/
+Allow: /api/content$
+Allow: /api/content?
+Allow: /api/portfolio$
+Allow: /api/portfolio?
+Allow: /api/auth/csrf$
+Allow: /api/quotes/estimate$
+
+Sitemap: https://app-dc-pilot-kc023-bhesg0a5g8ewhken.southafricanorth-01.azurewebsites.net/sitemap.xml

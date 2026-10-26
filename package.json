@@ -1,0 +1,14 @@
+{
+  "name": "dynamic-construction-workspace",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "setup": "node scripts/local.mjs setup",
+    "dev": "node scripts/local.mjs dev",
+    "check": "node scripts/local.mjs check",
+    "publish": "node scripts/local.mjs publish"
+  }
+}

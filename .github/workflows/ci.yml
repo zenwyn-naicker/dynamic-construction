@@ -1,0 +1,200 @@
+name: Build and verify
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    services:
+      sql:
+        image: mcr.microsoft.com/mssql/server:2025-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: Ci-Only!Sql2026-Test
+        ports: ["1433:1433"]
+    env:
+      ConnectionStrings__Database: Server=localhost,1433;Database=DynamicConstructionCI;User ID=sa;Password=Ci-Only!Sql2026-Test;TrustServerCertificate=True
+      TEST_PASSWORD: Ci-Only!Client2026
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: src/web/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build and check frontend and backend in parallel
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+
+          # Keep each branch's failure status and retain its full output.
+          (
+            set -euo pipefail
+            npm ci --prefix src/web
+            npm audit --prefix src/web --audit-level=moderate
+            npm run build --prefix src/web
+            npm run test --prefix src/web
+            cd src/web
+            npx playwright install --with-deps chromium
+          ) > artifacts/frontend-checks.log 2>&1 &
+          frontend_pid=$!
+          trap 'kill "$frontend_pid" 2>/dev/null || true' EXIT
+
+          (
+            set -euo pipefail
+            dotnet tool restore
+            dotnet restore --locked-mode
+            dotnet build -c Release --no-restore
+            dotnet test -c Release --no-build --collect:'XPlat Code Coverage'
+          ) > artifacts/backend-checks.log 2>&1 &
+          backend_pid=$!
+          trap 'kill "$frontend_pid" "$backend_pid" 2>/dev/null || true' EXIT
+
+          frontend_status=0
+          backend_status=0
+          wait "$frontend_pid" || frontend_status=$?
+          wait "$backend_pid" || backend_status=$?
+          trap - EXIT
+
+          echo 'Frontend checks and browser installation:'
+          cat artifacts/frontend-checks.log
+          echo 'Backend checks:'
+          cat artifacts/backend-checks.log
+
+          if [ "$frontend_status" -ne 0 ] || [ "$backend_status" -ne 0 ]; then
+            echo "::error::Checks failed: frontend=$frontend_status backend=$backend_status"
+            exit 1
+          fi
+      - name: SQL clean-create and repeat migration
+        run: |
+          for attempt in $(seq 1 20); do
+            dotnet ef database update --project src/DynamicConstruction.Api --configuration Release --no-build && break
+            test "$attempt" -lt 20 || exit 1
+            sleep 3
+          done
+          dotnet ef database update --project src/DynamicConstruction.Api --configuration Release --no-build
+      - name: Run real SQL API regression
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          Database__Provider: SqlServer
+          Storage__Provider: Local
+          FIXTURE_DATABASE_CONFIRMATION: isolated-test-database
+          Fixture__Password: ${{ env.TEST_PASSWORD }}
+          TEST_BASE_URL: http://127.0.0.1:5081
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet run --project tests/FixtureLoader -c Release --no-build --no-launch-profile
+          dotnet "$GITHUB_WORKSPACE/src/DynamicConstruction.Api/bin/Release/net10.0/DynamicConstruction.Api.dll" \
+            --contentRoot "$GITHUB_WORKSPACE/src/DynamicConstruction.Api" \
+            --urls "$TEST_BASE_URL" > api-test.log 2>&1 &
+          api_pid=$!
+          trap 'kill "$api_pid" 2>/dev/null || true; wait "$api_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent "$TEST_BASE_URL/api/health"; then break; fi
+            if ! kill -0 "$api_pid" 2>/dev/null || [ "$attempt" -eq 30 ]; then
+              cat api-test.log
+              exit 1
+            fi
+            sleep 2
+          done
+          python tests/integration.py
+          python tests/bootstrap.py
+      - name: Identity and MFA regression
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          Database__Provider: SqlServer
+          Storage__Provider: Local
+          TEST_BASE_URL: http://127.0.0.1:5083
+        shell: bash
+        run: |
+          set -euo pipefail
+          # A fresh process gives this suite its own in-memory rate-limit window.
+          # Account lockouts remain persisted in SQL; production limits are unchanged.
+          dotnet "$GITHUB_WORKSPACE/src/DynamicConstruction.Api/bin/Release/net10.0/DynamicConstruction.Api.dll" \
+            --contentRoot "$GITHUB_WORKSPACE/src/DynamicConstruction.Api" \
+            --urls "$TEST_BASE_URL" > security-api-test.log 2>&1 &
+          api_pid=$!
+          trap 'kill "$api_pid" 2>/dev/null || true; wait "$api_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent "$TEST_BASE_URL/api/health"; then break; fi
+            if ! kill -0 "$api_pid" 2>/dev/null || [ "$attempt" -eq 30 ]; then
+              cat security-api-test.log
+              exit 1
+            fi
+            sleep 2
+          done
+          # The intentional cooldown inside security.py is retained.
+          python tests/security.py
+      - name: Browser regression
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          Database__Provider: SqlServer
+          Storage__Provider: Local
+          API_TARGET: http://127.0.0.1:5084
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Reuse SQL fixtures while isolating this suite's rate-limit counters.
+          dotnet "$GITHUB_WORKSPACE/src/DynamicConstruction.Api/bin/Release/net10.0/DynamicConstruction.Api.dll" \
+            --contentRoot "$GITHUB_WORKSPACE/src/DynamicConstruction.Api" \
+            --urls "$API_TARGET" > browser-api-test.log 2>&1 &
+          api_pid=$!
+          trap 'kill "$api_pid" 2>/dev/null || true; wait "$api_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent "$API_TARGET/api/health"; then break; fi
+            if ! kill -0 "$api_pid" 2>/dev/null || [ "$attempt" -eq 30 ]; then
+              cat browser-api-test.log
+              exit 1
+            fi
+            sleep 2
+          done
+          npm run test:e2e --prefix src/web
+      - name: Package one release candidate
+        run: |
+          npm run publish -- --no-build --output artifacts/api
+          dotnet ef migrations bundle --project src/DynamicConstruction.Api --configuration Release --no-build --self-contained -r linux-x64 -o artifacts/efbundle
+          cp src/DynamicConstruction.Api/appsettings.json artifacts/appsettings.json
+          cp scripts/smoke-hosted.py artifacts/smoke-hosted.py
+          echo "$GITHUB_SHA" > artifacts/commit.txt
+      - name: Check the combined published app without Vite
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          Database__Provider: SqlServer
+          Storage__Provider: Local
+        run: |
+          cp -r artifacts/api "$RUNNER_TEMP/dc-published-smoke"
+          cd "$RUNNER_TEMP/dc-published-smoke"
+          dotnet DynamicConstruction.Api.dll --urls http://127.0.0.1:5082 > "$GITHUB_WORKSPACE/published-test.log" 2>&1 &
+          published_pid=$!
+          trap 'kill "$published_pid" || true' EXIT
+          python "$GITHUB_WORKSPACE/scripts/smoke-hosted.py" http://127.0.0.1:5082
+          test ! -d "$GITHUB_WORKSPACE/artifacts/api/App_Data"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-evidence
+          retention-days: 1
+          path: |
+            tests/**/TestResults/
+            artifacts/*.json
+            artifacts/*-checks.log
+            src/web/playwright-report/
+            src/web/test-results/
+            api-test.log
+            security-api-test.log
+            browser-api-test.log
+            published-test.log

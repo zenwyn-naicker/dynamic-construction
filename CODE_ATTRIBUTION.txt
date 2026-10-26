@@ -1,0 +1,146 @@
+/*Group Name: ETC ETC*/
+
+/*Group Members:
+Khayden Chetty
+Rivaan Kawulesar
+Stephane Nsengiyumva
+Zenwyn Naicker
+*/
+
+/*Code Attribution: */
+
+/**************************************************************************************************************
+ * Author: Microsoft
+ * Date: 2024
+ * Title: Consumer APIs overview for ASP.NET Core
+ * Type: [Documentation and sample code]
+ * Available at: <https://learn.microsoft.com/en-us/aspnet/core/security/data-protection/consumer-apis/overview?view=aspnetcore-10.0> [Accessed 18 October 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Microsoft (Rick Anderson)
+ * Date: n.d.
+ * Title: Work with SameSite cookies in ASP.NET Core
+ * Type: [Documentation and sample code]
+ * Available at: <https://learn.microsoft.com/en-us/aspnet/core/security/samesite?view=aspnetcore-10.0> [Accessed 18 October 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Microsoft
+ * Date: n.d.
+ * Title: UserManager<TUser>.UpdateSecurityStampAsync(TUser) Method
+ * Type: [API documentation]
+ * Available at: <https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1.updatesecuritystampasync?view=aspnetcore-10.0> [Accessed 18 October 2026]
+ **************************************************************************************************************/
+
+/**************************************************************************************************************
+ * Author: Microsoft and .NET contributors
+ * Date: 2026
+ * Title: ASP.NET Core
+ * Type: [Source Code]
+ * Available at: <https://github.com/dotnet/aspnetcore> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Microsoft and .NET contributors
+ * Date: 2026
+ * Title: Entity Framework Core
+ * Type: [Source Code]
+ * Available at: <https://github.com/dotnet/efcore> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Microsoft and Azure SDK contributors
+ * Date: 2026
+ * Title: Azure SDK for .NET
+ * Type: [Source Code]
+ * Available at: <https://github.com/Azure/azure-sdk-for-net> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: React contributors
+ * Date: 2026
+ * Title: React and React DOM
+ * Type: [Source Code]
+ * Available at: <https://github.com/react/react> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: React Router contributors
+ * Date: 2026
+ * Title: React Router
+ * Type: [Source Code]
+ * Available at: <https://github.com/remix-run/react-router> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Microsoft and TypeScript contributors
+ * Date: 2026
+ * Title: TypeScript
+ * Type: [Source Code]
+ * Available at: <https://github.com/microsoft/TypeScript> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Vite contributors
+ * Date: 2026
+ * Title: Vite
+ * Type: [Source Code]
+ * Available at: <https://github.com/vitejs/vite> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Node.js contributors
+ * Date: 2026
+ * Title: Node.js
+ * Type: [Source Code]
+ * Available at: <https://github.com/nodejs/node> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Python Software Foundation and Python contributors
+ * Date: 2026
+ * Title: CPython
+ * Type: [Source Code]
+ * Available at: <https://github.com/python/cpython> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: xUnit.net contributors
+ * Date: 2026
+ * Title: xUnit.net
+ * Type: [Source Code]
+ * Available at: <https://github.com/xunit/xunit> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Coverlet contributors
+ * Date: 2026
+ * Title: Coverlet
+ * Type: [Source Code]
+ * Available at: <https://github.com/coverlet-coverage/coverlet> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Vitest contributors
+ * Date: 2026
+ * Title: Vitest
+ * Type: [Source Code]
+ * Available at: <https://github.com/vitest-dev/vitest> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Microsoft and Playwright contributors
+ * Date: 2026
+ * Title: Playwright
+ * Type: [Source Code]
+ * Available at: <https://github.com/microsoft/playwright> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Microsoft
+ * Date: 2026
+ * Title: Azure Login GitHub Action
+ * Type: [Source Code]
+ * Available at: <https://github.com/Azure/login> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Microsoft
+ * Date: 2026
+ * Title: Azure Web Apps Deploy GitHub Action
+ * Type: [Source Code]
+ * Available at: <https://github.com/Azure/webapps-deploy> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+/**************************************************************************************************************
+ * Author: Microsoft
+ * Date: 2026
+ * Title: Azure Static Web Apps Deploy GitHub Action
+ * Type: [Source Code]
+ * Available at: <https://github.com/Azure/static-web-apps-deploy> [Accessed 15 September 2026]
+ **************************************************************************************************************/
+
